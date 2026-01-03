@@ -1,0 +1,6 @@
+"permission.screenRecording.title" = "Autoriser l’enregistrement d’écran";
+"permission.screenRecording.primary" = "Invar inverse les couleurs localement dans une zone sélectionnée de votre écran.";
+"permission.screenRecording.secondary" = "Cela nécessite l’accès pour lire les pixels de l’écran et appliquer l’effet visuel uniquement dans la zone que vous choisissez.";
+"permission.screenRecording.bullet1" = "Aucune vidéo n’est enregistrée";
+"permission.screenRecording.bullet2" = "Rien n’est stocké ni partagé";
+"permission.screenRecording.bullet3" = "Tout le traitement se fait sur votre Mac";

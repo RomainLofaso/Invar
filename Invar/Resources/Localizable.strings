@@ -1,0 +1,6 @@
+"permission.screenRecording.title" = "Allow screen recording";
+"permission.screenRecording.primary" = "Invar needs access to your screen to locally invert colors in a selected area.";
+"permission.screenRecording.secondary" = "This allows Invar to read pixels on your screen and apply a visual effect only inside the region you choose.";
+"permission.screenRecording.bullet1" = "No video is recorded";
+"permission.screenRecording.bullet2" = "Nothing is stored or shared";
+"permission.screenRecording.bullet3" = "All processing happens on your Mac";

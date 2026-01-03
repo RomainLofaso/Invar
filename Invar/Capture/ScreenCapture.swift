@@ -27,6 +27,7 @@ final class ScreenCapture {
         return capture(region: probe, belowWindowID: nil) != nil
     }
 
+
     func capture(region: CGRect, belowWindowID: CGWindowID?) -> CGImage? {
         let option: CGWindowListOption
         let windowID: CGWindowID

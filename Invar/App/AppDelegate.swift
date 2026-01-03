@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let screenCapture = ScreenCapture()
     private var hotKeyManager: HotKeyManager?
     private var didRequestScreenRecordingAccess = false
+    private var permissionPanel: ScreenRecordingPermissionPanel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -25,10 +26,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func checkScreenRecordingAccess() {
-        guard !screenCapture.hasPermission(), !didRequestScreenRecordingAccess, !Self.hasRequestedScreenRecordingAccess else { return }
+        guard !didRequestScreenRecordingAccess, !Self.hasRequestedScreenRecordingAccess else { return }
+        guard !screenCapture.hasPermission() else { return }
         didRequestScreenRecordingAccess = true
-        Self.hasRequestedScreenRecordingAccess = true
-        _ = screenCapture.requestPermission()
+        showScreenRecordingPermissionPanel()
+    }
+
+    private func showScreenRecordingPermissionPanel() {
+        permissionPanel = ScreenRecordingPermissionPanel(
+            showsOpenSettings: false,
+            onRequestAccess: { [weak self] in
+                guard let self else { return }
+                Self.hasRequestedScreenRecordingAccess = true
+                _ = self.screenCapture.requestPermission()
+                self.permissionPanel = nil
+            },
+            onCancel: { [weak self] in
+                self?.permissionPanel = nil
+            }
+        )
+        permissionPanel?.show()
     }
 
     private func installHotKey() {

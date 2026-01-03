@@ -16,6 +16,7 @@ final class StatusBarController {
     private var contrastSlider: NSSlider?
     private var brightnessSlider: NSSlider?
     private var gammaSlider: NSSlider?
+    private var permissionPanel: ScreenRecordingPermissionPanel?
     private lazy var adjustmentsItem: NSMenuItem = {
         let menu = NSMenu()
         let settings = InversionSettings.current
@@ -72,7 +73,10 @@ final class StatusBarController {
 
     init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        if let image = NSImage(systemSymbolName: "circle.lefthalf.filled", accessibilityDescription: "Invert") {
+        if let image = NSImage(named: NSImage.Name("StatusBarIcon")) {
+            image.isTemplate = true
+            statusItem.button?.image = image
+        } else if let image = NSImage(systemSymbolName: "circle.lefthalf.filled", accessibilityDescription: "Invert") {
             image.isTemplate = true
             statusItem.button?.image = image
         } else {
@@ -110,18 +114,17 @@ final class StatusBarController {
     }
 
     @objc private func selectRegion() {
+        guard let screen = screenUnderMouse() else {
+            print("Select region failed: no screen found for mouse location.")
+            return
+        }
         if !screenCapture.hasPermission() {
-            showAlert(title: "Permission Required", message: "Screen Recording permission is required. Quit and reopen the app after granting it.")
+            showScreenRecordingPermissionPanel()
             return
         }
         if let selectionWindow {
             selectionWindow.close()
             self.selectionWindow = nil
-        }
-
-        guard let screen = screenUnderMouse() else {
-            print("Select region failed: no screen found for mouse location.")
-            return
         }
 
         let window = SelectionOverlayWindow(
@@ -175,6 +178,21 @@ final class StatusBarController {
         alert.addButton(withTitle: "OK")
         NSApp.activate(ignoringOtherApps: true)
         alert.runModal()
+    }
+
+    private func showScreenRecordingPermissionPanel() {
+        guard permissionPanel == nil else { return }
+        permissionPanel = ScreenRecordingPermissionPanel(
+            showsOpenSettings: true,
+            onRequestAccess: { [weak self] in
+                _ = self?.screenCapture.requestPermission()
+                self?.permissionPanel = nil
+            },
+            onCancel: { [weak self] in
+                self?.permissionPanel = nil
+            }
+        )
+        permissionPanel?.show()
     }
 
     private func startInversionIfPossible() {
