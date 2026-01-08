@@ -31,6 +31,24 @@ The project focuses on **local constraints**, **explicit boundaries**, and **pre
 
 ---
 
+## Download & Install (Unsigned)
+
+Unsigned builds are provided for convenience and are not notarized. macOS will show a warning on first launch.
+
+1. Download `Invar-<version>-macos-unsigned.zip` from GitHub Releases.
+2. Unzip and drag `Invar.app` to `/Applications`.
+3. First launch: right-click `Invar.app` → Open → Open.
+4. Or: System Settings → Privacy & Security → Open Anyway.
+
+Invar does not record video and processes locally on your Mac.
+
+To build unsigned artifacts locally:
+```bash
+Tools/AppRelease/release_unsigned.sh
+```
+
+---
+
 ## License
 
 MIT License. See `LICENSE`.
