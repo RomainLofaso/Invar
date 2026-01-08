@@ -1,0 +1,17 @@
+name: PR CI Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: xcodebuild -project Invar.xcodeproj -scheme Invar -derivedDataPath /tmp/InvarDerivedData build
+      - name: Unit Tests
+        run: xcodebuild -project Invar.xcodeproj -scheme Invar -derivedDataPath /tmp/InvarDerivedData test -destination "platform=macOS" -only-testing:InvarTests
