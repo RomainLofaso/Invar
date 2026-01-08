@@ -1,2 +1,4 @@
 Tools/IconGenerator/build/
+Tools/AppRelease/build/
+Tools/AppRelease/dist/
 xcuserdata/
