@@ -1,0 +1,27 @@
+name: Release Artifacts
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build unsigned artifacts
+        run: Tools/AppRelease/release_unsigned.sh "${GITHUB_REF_NAME}"
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            Tools/AppRelease/dist/*.zip \
+            Tools/AppRelease/dist/*.dmg \
+            --title "${GITHUB_REF_NAME}" \
+            --notes ""
