@@ -5,47 +5,52 @@
 
 import AppKit
 import Carbon.HIToolbox
+import Combine
+import InvarCore
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private static var hasRequestedScreenRecordingAccess = false
     private var statusBarController: StatusBarController?
-    private let screenCapture = ScreenCapture()
     private var hotKeyManager: HotKeyManager?
-    private var didRequestScreenRecordingAccess = false
-    private var permissionPanel: ScreenRecordingPermissionPanel?
+    private let permissionStore = ScreenRecordingPermissionStore(authorizer: ScreenRecordingPermissionAuthorizerMacOS())
+    private lazy var permissionPresenter = ScreenRecordingPermissionPresenter(store: permissionStore)
+    private var permissionStateObserver: AnyCancellable?
+    private var activeObserver: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         NSApp.mainMenu = NSMenu()
         DispatchQueue.main.async {
-            self.statusBarController = StatusBarController()
-            self.checkScreenRecordingAccess()
+            self.statusBarController = StatusBarController(
+                permissionStore: self.permissionStore,
+                permissionPresenter: self.permissionPresenter
+            )
+            self.observePermissionState()
+            self.permissionStore.refresh()
+            self.installActiveObserver()
             self.installHotKey()
         }
     }
 
-    private func checkScreenRecordingAccess() {
-        guard !didRequestScreenRecordingAccess, !Self.hasRequestedScreenRecordingAccess else { return }
-        guard !screenCapture.hasPermission() else { return }
-        didRequestScreenRecordingAccess = true
-        showScreenRecordingPermissionPanel()
+    private func observePermissionState() {
+        permissionStateObserver = permissionStore.$state.sink { [weak self] state in
+            guard state == .missingPermission else { return }
+            self?.permissionPresenter.present(showsOpenSettings: false)
+        }
     }
 
-    private func showScreenRecordingPermissionPanel() {
-        permissionPanel = ScreenRecordingPermissionPanel(
-            showsOpenSettings: false,
-            onRequestAccess: { [weak self] in
-                guard let self else { return }
-                Self.hasRequestedScreenRecordingAccess = true
-                _ = self.screenCapture.requestPermission()
-                self.permissionPanel = nil
-            },
-            onCancel: { [weak self] in
-                self?.permissionPanel = nil
+    private func installActiveObserver() {
+        activeObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            let store = self.permissionStore
+            Task { @MainActor in
+                store.refresh()
             }
-        )
-        permissionPanel?.show()
+        }
     }
 
     private func installHotKey() {

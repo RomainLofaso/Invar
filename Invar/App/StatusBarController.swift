@@ -4,19 +4,15 @@
 //
 
 import AppKit
+import InvarCore
 
 final class StatusBarController {
     private let statusItem: NSStatusItem
-    private var selectionWindow: SelectionOverlayWindow?
-    private var selectedRegion: CGRect?
-    private var selectedScreen: NSScreen?
-    private let screenCapture = ScreenCapture()
-    private var inversionSession: InversionSession?
+    private let captureCoordinator: CaptureCoordinator
     private var useStandardWindow = UserDefaults.standard.bool(forKey: "useStandardWindow")
     private var contrastSlider: NSSlider?
     private var brightnessSlider: NSSlider?
     private var gammaSlider: NSSlider?
-    private var permissionPanel: ScreenRecordingPermissionPanel?
     private lazy var adjustmentsItem: NSMenuItem = {
         let menu = NSMenu()
         let settings = InversionSettings.current
@@ -71,7 +67,16 @@ final class StatusBarController {
         return item
     }()
 
-    init() {
+    init(permissionStore: ScreenRecordingPermissionStore, permissionPresenter: ScreenRecordingPermissionPresenter) {
+        let windowMode: InversionWindowMode = useStandardWindow ? .standard : .overlay
+        captureCoordinator = CaptureCoordinator(
+            permissionStore: permissionStore,
+            permissionPresenter: permissionPresenter,
+            regionSelector: RegionSelectionPresenterMacOS(),
+            sessionFactory: InversionSessionFactoryMacOS(),
+            alertPresenter: AlertPresenterMacOS(),
+            windowMode: windowMode
+        )
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let image = NSImage(named: NSImage.Name("StatusBarIcon")) {
             image.isTemplate = true
@@ -114,109 +119,16 @@ final class StatusBarController {
     }
 
     @objc private func selectRegion() {
-        guard let screen = screenUnderMouse() else {
-            print("Select region failed: no screen found for mouse location.")
-            return
-        }
-        if !screenCapture.hasPermission() {
-            showScreenRecordingPermissionPanel()
-            return
-        }
-        if let selectionWindow {
-            selectionWindow.close()
-            self.selectionWindow = nil
-        }
-
-        let window = SelectionOverlayWindow(
-            screen: screen,
-            onSelection: { [weak self] rect in
-                guard let self else { return }
-                self.selectedRegion = rect
-                self.selectedScreen = screen
-                print("Selected region: \(rect)")
-                DispatchQueue.main.async { [weak self] in
-                    self?.selectionWindow?.close()
-                    self?.selectionWindow = nil
-                }
-                self.startInversionIfPossible()
-            },
-            onCancel: { [weak self] in
-                print("Selection cancelled")
-                DispatchQueue.main.async { [weak self] in
-                    self?.selectionWindow?.close()
-                    self?.selectionWindow = nil
-                }
-            }
-        )
-        selectionWindow = window
-        window.present()
+        captureCoordinator.beginRegionSelection()
     }
 
     func beginRegionSelection() {
         selectRegion()
     }
 
-    @objc private func disableInversion() {
-        inversionSession?.stop()
-        inversionSession = nil
-    }
-
     @objc private func quit() {
         print("Quit requested")
         NSApp.terminate(nil)
-    }
-
-    private func screenUnderMouse() -> NSScreen? {
-        let mouseLocation = NSEvent.mouseLocation
-        return NSScreen.screens.first { $0.frame.contains(mouseLocation) } ?? NSScreen.main
-    }
-
-    private func showAlert(title: String, message: String) {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = message
-        alert.addButton(withTitle: "OK")
-        NSApp.activate(ignoringOtherApps: true)
-        alert.runModal()
-    }
-
-    private func showScreenRecordingPermissionPanel() {
-        guard permissionPanel == nil else { return }
-        permissionPanel = ScreenRecordingPermissionPanel(
-            showsOpenSettings: true,
-            onRequestAccess: { [weak self] in
-                _ = self?.screenCapture.requestPermission()
-                self?.permissionPanel = nil
-            },
-            onCancel: { [weak self] in
-                self?.permissionPanel = nil
-            }
-        )
-        permissionPanel?.show()
-    }
-
-    private func startInversionIfPossible() {
-        guard let selectedRegion, let selectedScreen else {
-            showAlert(title: "No Region Selected", message: "Select a region before enabling inversion.")
-            return
-        }
-
-        if inversionSession != nil {
-            inversionSession?.stop()
-            inversionSession = nil
-        }
-
-        let hasAccess = screenCapture.hasPermission()
-        if !hasAccess {
-            return
-        }
-
-        let mode: InversionWindowMode = useStandardWindow ? .standard : .overlay
-        let session = InversionSession(region: selectedRegion, screen: selectedScreen, mode: mode) { [weak self] in
-            self?.disableInversion()
-        }
-        inversionSession = session
-        session.start()
     }
 
     @objc private func contrastChanged(_ sender: NSSlider) {
@@ -277,13 +189,6 @@ final class StatusBarController {
         useStandardWindow.toggle()
         UserDefaults.standard.set(useStandardWindow, forKey: "useStandardWindow")
         windowModeItem.state = useStandardWindow ? .on : .off
-
-        if let session = inversionSession {
-            selectedRegion = session.currentRegion
-            selectedScreen = session.currentScreen
-            session.stop()
-            inversionSession = nil
-            startInversionIfPossible()
-        }
+        captureCoordinator.setWindowMode(useStandardWindow ? .standard : .overlay)
     }
 }

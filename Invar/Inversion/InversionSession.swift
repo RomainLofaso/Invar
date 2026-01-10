@@ -5,6 +5,7 @@
 
 import AppKit
 import CoreGraphics
+import InvarCore
 import QuartzCore
 
 final class InversionSession: NSObject, NSWindowDelegate {

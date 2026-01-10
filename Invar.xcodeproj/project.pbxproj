@@ -6,14 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7A9F9F0D2F0C11110056FF6E /* InvarCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A9F9F0C2F0C11110056FF6E /* InvarCore */; };
+		7A9F9F0E2F0C11110056FF6E /* InvarCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A9F9F0C2F0C11110056FF6E /* InvarCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
-		7AE8944D2EF81AD300A7FCF0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7AE894372EF81AD100A7FCF0 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7AE8943E2EF81AD100A7FCF0;
-			remoteInfo = Invar;
-		};
 		7AE894572EF81AD400A7FCF0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7AE894372EF81AD100A7FCF0 /* Project object */;
@@ -38,6 +36,7 @@
 		7A56455F2F0905D30056FF6E /* icon_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_512x512.png; sourceTree = "<group>"; };
 		7A5645602F0905D30056FF6E /* icon_512x512@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_512x512@2x.png"; sourceTree = "<group>"; };
 		7A5645642F0905D30056FF6E /* sync_icons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sync_icons.swift; sourceTree = "<group>"; };
+		7A5646592F094E950056FF6E /* Prompt Draft.md */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prompt Draft.md"; sourceTree = "<group>"; };
 		7ABD96042F01D660005FB47F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		7AE8943F2EF81AD100A7FCF0 /* Invar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Invar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AE8944C2EF81AD300A7FCF0 /* InvarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InvarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A9F9F0D2F0C11110056FF6E /* InvarCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A9F9F0E2F0C11110056FF6E /* InvarCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +135,7 @@
 		7AE894362EF81AD100A7FCF0 = {
 			isa = PBXGroup;
 			children = (
+				7A5646592F094E950056FF6E /* Prompt Draft.md */,
 				7A5640CB2F0900B30056FF6E /* AGENTS.md */,
 				7ABD96042F01D660005FB47F /* README.md */,
 				7AE894412EF81AD100A7FCF0 /* Invar */,
@@ -174,6 +176,7 @@
 			);
 			name = Invar;
 			packageProductDependencies = (
+				7A9F9F0C2F0C11110056FF6E /* InvarCore */,
 			);
 			productName = Invar;
 			productReference = 7AE8943F2EF81AD100A7FCF0 /* Invar.app */;
@@ -190,13 +193,13 @@
 			buildRules = (
 			);
 			dependencies = (
-				7AE8944E2EF81AD300A7FCF0 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				7AE8944F2EF81AD300A7FCF0 /* InvarTests */,
 			);
 			name = InvarTests;
 			packageProductDependencies = (
+				7A9F9F0C2F0C11110056FF6E /* InvarCore */,
 			);
 			productName = InvarTests;
 			productReference = 7AE8944C2EF81AD300A7FCF0 /* InvarTests.xctest */;
@@ -240,7 +243,6 @@
 					};
 					7AE8944B2EF81AD300A7FCF0 = {
 						CreatedOnToolsVersion = 26.2;
-						TestTargetID = 7AE8943E2EF81AD100A7FCF0;
 					};
 					7AE894552EF81AD400A7FCF0 = {
 						CreatedOnToolsVersion = 26.2;
@@ -258,6 +260,9 @@
 			);
 			mainGroup = 7AE894362EF81AD100A7FCF0;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7A9F9F0B2F0C11110056FF6E /* InvarCore */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7AE894402EF81AD100A7FCF0 /* Products */;
 			projectDirPath = "";
@@ -319,11 +324,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		7AE8944E2EF81AD300A7FCF0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7AE8943E2EF81AD100A7FCF0 /* Invar */;
-			targetProxy = 7AE8944D2EF81AD300A7FCF0 /* PBXContainerItemProxy */;
-		};
 		7AE894582EF81AD400A7FCF0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7AE8943E2EF81AD100A7FCF0 /* Invar */;
@@ -533,7 +533,6 @@
 		7AE894642EF81AD400A7FCF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -550,7 +549,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Invar.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Invar";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Debug;
@@ -558,7 +556,6 @@
 		7AE894652EF81AD400A7FCF0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -575,7 +572,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Invar.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Invar";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Release;
@@ -629,6 +625,21 @@
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		7A9F9F0B2F0C11110056FF6E /* InvarCore */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = InvarCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7A9F9F0C2F0C11110056FF6E /* InvarCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A9F9F0B2F0C11110056FF6E /* InvarCore */;
+			productName = InvarCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCConfigurationList section */
 		7AE8943A2EF81AD100A7FCF0 /* Build configuration list for PBXProject "Invar" */ = {

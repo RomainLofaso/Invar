@@ -14,14 +14,6 @@ private func CGWindowListCreateImageShim(
 ) -> CGImage?
 
 final class ScreenCapture {
-    func hasPermission() -> Bool {
-        CGPreflightScreenCaptureAccess()
-    }
-
-    func requestPermission() -> Bool {
-        CGRequestScreenCaptureAccess()
-    }
-
     func canCapture(region: CGRect) -> Bool {
         let probe = CGRect(x: region.minX, y: region.minY, width: 1, height: 1)
         return capture(region: probe, belowWindowID: nil) != nil
