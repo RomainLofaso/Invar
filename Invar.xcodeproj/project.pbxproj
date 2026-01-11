@@ -261,7 +261,7 @@
 			mainGroup = 7AE894362EF81AD100A7FCF0;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				7A9F9F0B2F0C11110056FF6E /* InvarCore */,
+				7A9F9F0B2F0C11110056FF6E /* XCLocalSwiftPackageReference "InvarCore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7AE894402EF81AD100A7FCF0 /* Products */;
@@ -626,21 +626,6 @@
 		};
 /* End XCBuildConfiguration section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		7A9F9F0B2F0C11110056FF6E /* InvarCore */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = InvarCore;
-		};
-/* End XCLocalSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		7A9F9F0C2F0C11110056FF6E /* InvarCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7A9F9F0B2F0C11110056FF6E /* InvarCore */;
-			productName = InvarCore;
-		};
-/* End XCSwiftPackageProductDependency section */
-
 /* Begin XCConfigurationList section */
 		7AE8943A2EF81AD100A7FCF0 /* Build configuration list for PBXProject "Invar" */ = {
 			isa = XCConfigurationList;
@@ -679,6 +664,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		7A9F9F0B2F0C11110056FF6E /* XCLocalSwiftPackageReference "InvarCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = InvarCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7A9F9F0C2F0C11110056FF6E /* InvarCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A9F9F0B2F0C11110056FF6E /* XCLocalSwiftPackageReference "InvarCore" */;
+			productName = InvarCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7AE894372EF81AD100A7FCF0 /* Project object */;
 }

@@ -67,11 +67,10 @@ final class StatusBarController {
         return item
     }()
 
-    init(permissionStore: ScreenRecordingPermissionStore, permissionPresenter: ScreenRecordingPermissionPresenter) {
+    init(permissionViewModel: ScreenRecordingPermissionViewModel) {
         let windowMode: InversionWindowMode = useStandardWindow ? .standard : .overlay
         captureCoordinator = CaptureCoordinator(
-            permissionStore: permissionStore,
-            permissionPresenter: permissionPresenter,
+            permissionViewModel: permissionViewModel,
             regionSelector: RegionSelectionPresenterMacOS(),
             sessionFactory: InversionSessionFactoryMacOS(),
             alertPresenter: AlertPresenterMacOS(),

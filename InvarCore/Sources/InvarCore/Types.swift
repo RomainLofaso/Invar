@@ -26,3 +26,9 @@ public enum InversionWindowMode: Equatable {
     case overlay
     case standard
 }
+
+public enum ScreenRecordingAuthorizationStatus: Equatable {
+    case authorized
+    case notDetermined
+    case denied
+}

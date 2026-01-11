@@ -3,13 +3,11 @@
 //  Invar
 //
 
+import InvarCore
 import SwiftUI
 
 struct ScreenRecordingPermissionView: View {
-    let showsOpenSettings: Bool
-    let onContinue: () -> Void
-    let onNotNow: () -> Void
-    let onOpenSettings: () -> Void
+    @ObservedObject var viewModel: ScreenRecordingPermissionViewModel
 
     private let bullets = [
         ScreenRecordingPermissionCopy.bullet1,
@@ -69,15 +67,12 @@ struct ScreenRecordingPermissionView: View {
 
             HStack(spacing: 8) {
                 Spacer()
-                if showsOpenSettings {
-                    Button("Open Settings", action: onOpenSettings)
-                }
-                Button("Not Now", action: onNotNow)
-                Button("Continue", action: onContinue)
+                Button("Continue", action: viewModel.requestPermission)
                     .keyboardShortcut(.defaultAction)
             }
         }
         .padding(24)
         .frame(minWidth: 500)
+        // The view is hosted in a dedicated AppKit window, so inline UI is simpler than a sheet.
     }
 }

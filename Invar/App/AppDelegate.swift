@@ -7,36 +7,71 @@ import AppKit
 import Carbon.HIToolbox
 import Combine
 import InvarCore
+import SwiftUI
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var statusBarController: StatusBarController?
     private var hotKeyManager: HotKeyManager?
-    private let permissionStore = ScreenRecordingPermissionStore(authorizer: ScreenRecordingPermissionAuthorizerMacOS())
-    private lazy var permissionPresenter = ScreenRecordingPermissionPresenter(store: permissionStore)
-    private var permissionStateObserver: AnyCancellable?
+    private let permissionService = MacOSScreenRecordingPermissionService()
+    private lazy var permissionViewModel = ScreenRecordingPermissionViewModel(service: permissionService)
+    private var permissionUIObserver: AnyCancellable?
     private var activeObserver: Any?
+    private var permissionWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         NSApp.mainMenu = NSMenu()
         DispatchQueue.main.async {
             self.statusBarController = StatusBarController(
-                permissionStore: self.permissionStore,
-                permissionPresenter: self.permissionPresenter
+                permissionViewModel: self.permissionViewModel
             )
-            self.observePermissionState()
-            self.permissionStore.refresh()
+            self.observePermissionUI()
+            self.permissionViewModel.refreshStatus()
             self.installActiveObserver()
             self.installHotKey()
         }
     }
 
-    private func observePermissionState() {
-        permissionStateObserver = permissionStore.$state.sink { [weak self] state in
-            guard state == .missingPermission else { return }
-            self?.permissionPresenter.present(showsOpenSettings: false)
-        }
+    private func observePermissionUI() {
+        permissionUIObserver = permissionViewModel.$shouldShowPermissionUI
+            .removeDuplicates()
+            .sink { [weak self] shouldShow in
+                guard let self else { return }
+                if shouldShow {
+                    self.showPermissionWindow()
+                } else {
+                    self.hidePermissionWindow()
+                }
+            }
+    }
+
+    private func showPermissionWindow() {
+        guard permissionWindow == nil else { return }
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 320),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Screen Recording Permission"
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        window.contentView = NSHostingView(rootView: ScreenRecordingPermissionView(viewModel: permissionViewModel))
+        window.center()
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        permissionWindow = window
+    }
+
+    private func hidePermissionWindow() {
+        permissionWindow?.close()
+        permissionWindow = nil
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow, window == permissionWindow else { return }
+        permissionWindow = nil
     }
 
     private func installActiveObserver() {
@@ -46,10 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             queue: .main
         ) { [weak self] _ in
             guard let self else { return }
-            let store = self.permissionStore
-            Task { @MainActor in
-                store.refresh()
-            }
+            self.permissionViewModel.refreshStatus()
         }
     }
 
@@ -57,21 +89,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let modifiers = UInt32(optionKey | controlKey)
         hotKeyManager = HotKeyManager(keyCode: UInt32(kVK_Space), modifiers: modifiers) { [weak self] in
             self?.statusBarController?.beginRegionSelection()
-        }
-    }
-
-    private func showScreenRecordingPermissionAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Screen Recording Permission Needed"
-        alert.informativeText = "Enable Screen Recording for Invar in System Settings > Privacy & Security > Screen Recording."
-        alert.addButton(withTitle: "Open Settings")
-        alert.addButton(withTitle: "Cancel")
-
-        NSApp.activate(ignoringOtherApps: true)
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn,
-           let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
-            NSWorkspace.shared.open(url)
         }
     }
 }

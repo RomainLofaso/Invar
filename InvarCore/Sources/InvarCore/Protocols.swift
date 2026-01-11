@@ -1,12 +1,8 @@
 import Foundation
 
-public protocol ScreenRecordingAuthorizing {
-    func preflight() -> Bool
-    func requestAccess() async -> Bool
-}
-
-public protocol ScreenRecordingPermissionPresenting {
-    func present(showsOpenSettings: Bool)
+public protocol ScreenRecordingPermissionService {
+    func authorizationStatus() -> ScreenRecordingAuthorizationStatus
+    func requestAuthorization()
 }
 
 public protocol RegionSelecting {

@@ -2,51 +2,40 @@ import Foundation
 
 @MainActor
 public final class CaptureCoordinator {
-    private let permissionStore: ScreenRecordingPermissionStore
-    private let permissionPresenter: ScreenRecordingPermissionPresenting
+    private let permissionViewModel: ScreenRecordingPermissionViewModel
     private let regionSelector: RegionSelecting
     private let sessionFactory: InversionSessionCreating
     private let alertPresenter: AlertPresenting
-    private let captureGate: CaptureGate
     private var selectedRegion: CaptureRegion?
     private var selectedScreen: ScreenDescriptor?
     private var inversionSession: InversionSessionHandling?
     private var windowMode: InversionWindowMode
 
     public init(
-        permissionStore: ScreenRecordingPermissionStore,
-        permissionPresenter: ScreenRecordingPermissionPresenting,
+        permissionViewModel: ScreenRecordingPermissionViewModel,
         regionSelector: RegionSelecting,
         sessionFactory: InversionSessionCreating,
         alertPresenter: AlertPresenting,
         windowMode: InversionWindowMode
     ) {
-        self.permissionStore = permissionStore
-        self.permissionPresenter = permissionPresenter
+        self.permissionViewModel = permissionViewModel
         self.regionSelector = regionSelector
         self.sessionFactory = sessionFactory
         self.alertPresenter = alertPresenter
         self.windowMode = windowMode
-        self.captureGate = CaptureGate(permissionStore: permissionStore)
     }
 
     public func beginRegionSelection() {
-        captureGate.attemptStart(
-            onGranted: { [weak self] in
+        permissionViewModel.refreshStatus()
+        guard permissionViewModel.authorizationStatus == .authorized else { return }
+        regionSelector.beginSelection(
+            onSelection: { [weak self] region, screen in
                 guard let self else { return }
-                regionSelector.beginSelection(
-                    onSelection: { [weak self] region, screen in
-                        guard let self else { return }
-                        self.selectedRegion = region
-                        self.selectedScreen = screen
-                        self.startInversionIfPossible()
-                    },
-                    onCancel: {}
-                )
+                self.selectedRegion = region
+                self.selectedScreen = screen
+                self.startInversionIfPossible()
             },
-            onMissing: { [weak self] in
-                self?.permissionPresenter.present(showsOpenSettings: true)
-            }
+            onCancel: {}
         )
     }
 
@@ -80,22 +69,16 @@ public final class CaptureCoordinator {
             inversionSession = nil
         }
 
-        captureGate.attemptStart(
-            onGranted: { [weak self] in
-                guard let self else { return }
-                let session = sessionFactory.makeSession(
-                    region: selectedRegion,
-                    screen: selectedScreen,
-                    mode: windowMode
-                ) { [weak self] in
-                    self?.disableInversion()
-                }
-                inversionSession = session
-                session.start()
-            },
-            onMissing: { [weak self] in
-                self?.permissionPresenter.present(showsOpenSettings: true)
-            }
-        )
+        permissionViewModel.refreshStatus()
+        guard permissionViewModel.authorizationStatus == .authorized else { return }
+        let session = sessionFactory.makeSession(
+            region: selectedRegion,
+            screen: selectedScreen,
+            mode: windowMode
+        ) { [weak self] in
+            self?.disableInversion()
+        }
+        inversionSession = session
+        session.start()
     }
 }
