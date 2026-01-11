@@ -1,5 +1,5 @@
 //
-//  InvarCoreAdapters.swift
+//  ScreenDescriptorAdapters.swift
 //  Invar
 //
 

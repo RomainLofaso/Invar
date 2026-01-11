@@ -31,6 +31,20 @@ The project focuses on **local constraints**, **explicit boundaries**, and **pre
 
 ---
 
+## Testing
+
+Unit tests (CI-friendly, no UI):
+```bash
+xcodebuild -project Invar.xcodeproj -scheme Invar test -destination "platform=macOS" -only-testing:InvarTests
+```
+
+UI tests can be run explicitly if needed:
+```bash
+xcodebuild -project Invar.xcodeproj -scheme Invar test -destination "platform=macOS" -only-testing:InvarUITests
+```
+
+---
+
 ## Download & Install (Unsigned)
 
 Unsigned builds are provided for convenience and are not notarized. macOS will show a warning on first launch.
