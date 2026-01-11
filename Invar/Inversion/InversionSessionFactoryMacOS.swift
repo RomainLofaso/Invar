@@ -13,6 +13,7 @@ final class InversionSessionFactoryMacOS: InversionSessionCreating {
         mode: InversionWindowMode,
         onStop: @escaping () -> Void
     ) -> InversionSessionHandling {
+        let targetBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
         guard let resolvedScreen = NSScreen.screen(for: screen) ?? NSScreen.main ?? NSScreen.screens.first else {
             preconditionFailure("No NSScreen available for inversion session.")
         }
@@ -20,6 +21,7 @@ final class InversionSessionFactoryMacOS: InversionSessionCreating {
             region: region.cgRect,
             screen: resolvedScreen,
             mode: mode,
+            targetBundleIdentifier: targetBundleIdentifier,
             onStop: onStop
         )
         return InversionSessionAdapter(session: session)

@@ -30,9 +30,8 @@ final class InversionControlWindow: NSPanel {
         isOpaque = false
         backgroundColor = .clear
         hasShadow = true
-        level = .screenSaver
+        level = .normal
         isReleasedWhenClosed = false
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         ignoresMouseEvents = false
 
         contentView = controlView

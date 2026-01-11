@@ -31,9 +31,8 @@ final class CornerHandleWindow: NSPanel {
         isOpaque = false
         backgroundColor = .clear
         hasShadow = false
-        level = NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 2)
+        level = .normal
         isReleasedWhenClosed = false
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         ignoresMouseEvents = false
         contentView = handleView
     }

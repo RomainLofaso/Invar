@@ -21,9 +21,8 @@ final class InversionOverlayWindow: NSWindow, InversionDisplayWindow {
         backgroundColor = .clear
         hasShadow = false
         isReleasedWhenClosed = false
-        level = .screenSaver
+        level = .normal
         ignoresMouseEvents = true
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
     }
 
     required init?(coder: NSCoder) {

@@ -13,6 +13,7 @@ final class InversionSession: NSObject, NSWindowDelegate {
     private var screen: NSScreen
     private let displayWindow: InversionDisplayWindow
     private let onStop: () -> Void
+    private let targetBundleIdentifier: String?
     private lazy var controlWindow: InversionControlWindow = {
         InversionControlWindow(
             region: region,
@@ -47,10 +48,20 @@ final class InversionSession: NSObject, NSWindowDelegate {
     private var inFlight = false
     private var isStopping = false
     private var settingsObserver: Any?
+    private var activeAppObserver: Any?
+    private var spaceObserver: Any?
+    private var overlayVisible = true
 
-    init(region: CGRect, screen: NSScreen, mode: InversionWindowMode, onStop: @escaping () -> Void) {
+    init(
+        region: CGRect,
+        screen: NSScreen,
+        mode: InversionWindowMode,
+        targetBundleIdentifier: String?,
+        onStop: @escaping () -> Void
+    ) {
         self.region = region
         self.screen = screen
+        self.targetBundleIdentifier = targetBundleIdentifier
         switch mode {
         case .overlay:
             self.displayWindow = InversionOverlayWindow(region: region)
@@ -76,6 +87,8 @@ final class InversionSession: NSObject, NSWindowDelegate {
         scheduler.start()
         installKeyMonitors()
         installSettingsObserver()
+        installFocusObservers()
+        updateOverlayVisibilityIfNeeded()
     }
 
     func stop() {
@@ -87,6 +100,7 @@ final class InversionSession: NSObject, NSWindowDelegate {
         }
         removeKeyMonitors()
         removeSettingsObserver()
+        removeFocusObservers()
     }
 
     private func tick() {
@@ -265,6 +279,56 @@ final class InversionSession: NSObject, NSWindowDelegate {
         if let settingsObserver {
             NotificationCenter.default.removeObserver(settingsObserver)
             self.settingsObserver = nil
+        }
+    }
+
+    private func installFocusObservers() {
+        guard isOverlayMode else { return }
+        let workspaceCenter = NSWorkspace.shared.notificationCenter
+        activeAppObserver = workspaceCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateOverlayVisibilityIfNeeded()
+        }
+        spaceObserver = workspaceCenter.addObserver(
+            forName: NSWorkspace.activeSpaceDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.requestStop()
+        }
+    }
+
+    private func removeFocusObservers() {
+        let workspaceCenter = NSWorkspace.shared.notificationCenter
+        if let activeAppObserver {
+            workspaceCenter.removeObserver(activeAppObserver)
+            self.activeAppObserver = nil
+        }
+        if let spaceObserver {
+            workspaceCenter.removeObserver(spaceObserver)
+            self.spaceObserver = nil
+        }
+    }
+
+    private func updateOverlayVisibilityIfNeeded() {
+        guard isOverlayMode else { return }
+        let frontmostBundleID = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+        let shouldShow = targetBundleIdentifier.map { $0 == frontmostBundleID } ?? true
+        if shouldShow == overlayVisible {
+            return
+        }
+        overlayVisible = shouldShow
+        if shouldShow {
+            displayWindow.present()
+            controlWindow.present()
+            handleWindows.forEach { $0.present() }
+        } else {
+            displayWindow.nsWindow.orderOut(nil)
+            controlWindow.orderOut(nil)
+            handleWindows.forEach { $0.orderOut(nil) }
         }
     }
 
